@@ -128,3 +128,19 @@ Prediction Matrix Softmax(Multiplication Matrix  5*1)
  0.002  
  0.001  
 
+
+
+
+ #SentimentPipeline 
+ # This command run on command prompt
+ D:\datatoload\stanford-corenlp-full-2014-01-04>java -cp stanford-corenlp-3.3.1.jar;stanford-corenlp-3.3.1-models.jar;xom.jar;joda-time.jar;jollyday.jar;ejml-0.23.jar -mx5g edu.stanford.nlp.sentiment.SentimentPipeline -file Post.csv > <Output file path>
+ 
+ 
+ java -cp stanford-corenlp-3.3.1.jar;stanford-corenlp-3.3.1-models.jar;xom.jar;joda-time.jar;jollyday.jar;ejml-0.23.jar -Xmx3g edu.stanford.nlp.sentiment.Evaluate -file Post.csv
+
+java -cp stanford-corenlp-3.3.1.jar;stanford-corenlp-3.3.1-models.jar -Xmx3g edu.stanford.nlp.pipeline.StanfordCoreNLP  -file Post.csv
+
+ -annotators tokenize,ssplit,pos,lemma,ner,parse,dcoref 
+ 
+ #java -cp stanford-corenlp-3.3.1.jar;stanford-corenlp-3.3.1-models.jar;xom.jar;joda-time.jar;jollyday.jar;ejml-0.23.jar -Xmx3g edu.stanford.nlp.sentiment.Evaluate Post.csv
+ 
