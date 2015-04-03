@@ -47,3 +47,47 @@ Note:
 Update Year and Month condition in query in AccuracyReport.hql 
 Update TargetFile name for relevent year and month.
 Run AccuracyReport.bat as hadoop user.
+
+
+Region year month status mapping file_name cnt
+Beltway	2014	Mar	SAP Hierarchy	comcast_agilyst_20131216.txt	1
+FinalRegion	Mapping	file_name	year	month	cnt
+Beltway	SAP Hierarchy	comcast_agilyst_20140331.txt	2014	Mar	1
+
+Regions
+'National'
+Beltway'
+Freedom'
+Florida'
+
+forgot to provide you queries earlier:
+
+--1-- Number of tickets
+Select month, count(distinct ticket_id) from infoddp
+group by month;
+
+
+--2-- Null/empty Agent Logins
+Select month, count(distinct ticket_id) from infoddp where 
+(length(LTRIM(RTRIM(infoddp.grandslamlogin))) <5)
+group by month;
+
+--3-- Matching Grandslamlogins with sap_hierarchy
+select month, count(distinct grandslamlogin)
+FROM
+infoddp inner join 
+(
+                select 
+                LOWER(LTRIM(RTRIM(nt_user_name))) sap_hierarchy_nt_user_name 
+                from sap_hierarchy where length(LTRIM(RTRIM(nt_user_name)))>0
+)saphierarchy 
+on (length(LTRIM(RTRIM(infoddp.grandslamlogin))) between 4 and 16)  and LOWER(LTRIM(RTRIM(infoddp.grandslamlogin)))=saphierarchy.sap_hierarchy_nt_user_name
+group by month
+
+--4-- Matching Grandslamlogins with Vendor Admin
+select month, count(distinct grandslamlogin)
+FROM
+infoddp join 
+vender_agents on
+on (length(LTRIM(RTRIM(infoddp.grandslamlogin))) between 4 and 16)  and LOWER(LTRIM(RTRIM(infoddp.grandslamlogin)))=LOWER(LTRIM(RTRIM(vender_agents.bpid)))
+group by month
