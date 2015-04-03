@@ -25,3 +25,25 @@ FROM (Select * from dtcc_main_orc where  ismapped='true') A
     	join 
    	(Select * from dtcc_main_orc d JOIN matchedtrades m ON d.id=m.cp_id) B 
 		ON A.id=B.tp_id;
+
+
+Accuracy Report Generation Steps:
+
+1. Cleanse and Load Agents data in hbase. Add file name to data through files list master..
+	SapHierarchy 
+	Vendor admin.
+	
+2. Overwrite in Hive from hbase SapHierarchy, vendor Admin
+3. Load updated framework data retreived from portal to Hive for the  year/month partition.
+4. Execute AccuracyReport.hql after updating condition for year and month
+5. Move D:\OneComcastView\AccuracyReport\000000_0 to TargetLocation with ReportName <YYYY-MM.tsv>
+6. Web App:
+	pull list of files
+	Fill dropdowns for Year, Month (Dynamically from file names)
+	Fill dropdown for Frameworks (Fixed)
+	Load required file and show results.
+
+Note: 
+Update Year and Month condition in query in AccuracyReport.hql 
+Update TargetFile name for relevent year and month.
+Run AccuracyReport.bat as hadoop user.
