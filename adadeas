@@ -1,0 +1,142 @@
+
+1)
+package com.hcom.udf;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.UDF;
+
+@Description(name = "EvaluateMax",
+value = "_FUNC_(HcomRank,advertiser1,advertiser2,...advertiser8,price1,price2,...price8) - Returns the tab splitted string as values of "
+		+ "PropertyName \t Max Price ",
+extended = "Example:\n"
+		+ " > SELECT _FUNC_(HcomRank, advertiser1,advertiser2,...advertiser8,price1,price2,...price8) FROM table_name;\n")
+
+public class EvaluateMax extends UDF{
+
+	public String evaluate(int hcomRank,String ... args)
+	{
+		String result=null;
+		
+		ArrayList<String> advertisers=new ArrayList<String>();
+		ArrayList<Double> prices=new ArrayList<Double>();
+		
+		String tmp;
+		
+		for(int i=8;i<16;i++)
+		{
+//			if(hcomRank==i-8)
+//				continue;
+			if(args[i]!=null && args[i-8]!=null)
+			{
+				tmp=args[i].trim();
+				if(!tmp.isEmpty())
+				{
+					prices.add(Double.parseDouble(tmp));
+					advertisers.add(args[i-8].trim());
+				}
+			}
+		}
+		int index=0;
+		if(prices.size()>0)
+		{
+			index = prices.indexOf(Collections.max(prices));
+			result=advertisers.get(index)+'\t' + Double.toString(prices.get(index));
+		}
+		return result;
+	}
+}
+
+
+2) min
+
+package com.hcom.udf;
+
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.UDF;
+
+@Description(name = "EvaluateMin",
+value = "_FUNC_(HcomRank,advertiser1,advertiser2,...advertiser8,price1,price2,...price8) - Returns the tab splitted string as values of "
+		+ "PropertyName \t Min Price ",
+extended = "Example:\n"
+		+ " > SELECT _FUNC_(HcomRank, advertiser1,advertiser2,...advertiser8,price1,price2,...price8) FROM table_name;\n")
+
+public class EvaluateMin extends UDF{
+	
+	public String evaluate(int hcomRank,String ... args)
+	{
+		String result=null;
+		
+		ArrayList<String> advertisers=new ArrayList<String>();
+		ArrayList<Double> prices=new ArrayList<Double>();
+		
+		String tmp;
+		
+		for(int i=8;i<16;i++)
+		{
+//			if(hcomRank==i-8)
+//				continue;
+			if(args[i]!=null  && args[i-8]!=null)
+			{
+				tmp=args[i].trim();
+				if(!tmp.isEmpty())
+				{
+					prices.add(Double.parseDouble(tmp));
+					advertisers.add(args[i-8].trim());
+				}
+			}
+		}
+		int index=0;
+		if(prices.size()>0)
+		{
+			index= prices.indexOf(Collections.min(prices));
+			result=advertisers.get(index)+'\t' + Double.toString(prices.get(index));
+		}
+		return result;
+	}
+	
+}
+3 avg
+
+package com.hcom.udf;
+
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.log.*;
+import org.apache.hadoop.hive.ql.exec.UDF;
+@Description(name = "EvaluateAvg",
+value = "_FUNC_(HcomRank, price1,price2,...price8) - Returns the tab splitted string as values of "
+		+ "Avg Price ",
+extended = "Example:\n"
+		+ " > SELECT _FUNC_(HcomRank, price1,price2,...price8) FROM table_name;\n")
+
+public class EvaluateAvg extends UDF{
+	
+	public String evaluate(int hcomRank,String ... args)
+	{
+		float tmp=0;
+		int count=0;
+		
+		for(int i=0;i<8;i++)
+		{
+			if(hcomRank-1==i)// Rank start with 1 & i start with 0 so, hcomrank-1
+				continue;
+			if(args[i]!=null && !(args[i].trim()).isEmpty() )
+			{
+				count++;
+				tmp+=Float.parseFloat(args[i].trim());
+			}
+		}
+		if(count>0)
+			return Float.toString(tmp/count);
+		else
+			return "";
+	}
+}
+
+
+4-
