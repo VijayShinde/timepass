@@ -1,0 +1,31 @@
+
+-- Way to enable insertion,deletion,update & select operation in hive use below steps
+1) Go to metastore
+2) search for dbs tables select * from dbs
+3) get db_id for which you want to change privileges
+4) get tbl_id for db_id which you want
+5)  Insert appropriate privileges as defined below
+Procedure:
+use metastore_db;
+select * from dbs;	get db_id e.g 46
+
++-------+-----------------------+----------------------------------------------------------+----------------+------------+------------+
+| DB_ID | DESC                  | DB_LOCATION_URI                                          | NAME           | OWNER_NAME | OWNER_TYPE |
++-------+-----------------------+----------------------------------------------------------+----------------+------------+------------+
+|    46 | NULL                  | hdfs://server_name:8020/hive/warehouse/dbname.db         | db_name        | hadoop     | USER       |
++-------+-----------------------+----------------------------------------------------------+----------------+------------+------------+
+
+select * from tbl where db_id=46; 
+this will show table details under this database,
+take table id which you want to add privileges
+
+Then just insert into tbl_privs according to table id  This work form me
+		  
+ insert into tbl_privs values(552,1429268536,1,'hadoop','USER','hadoop','USER','INSERT',326);
+ insert into tbl_privs values(553,1429268536,1,'hadoop','USER','hadoop','USER','SELECT',326);
+ insert into tbl_privs values(554,1429268536,1,'hadoop','USER','hadoop','USER','UPDATE',326);
+ insert into tbl_privs values(555,1429268536,1,'hadoop','USER','hadoop','USER','DELETE',326);
+ insert into tbl_privs values(556,1429268536,1,'hadoop','USER','hadoop','USER','INSERT',327);
+ insert into tbl_privs values(557,1429268536,1,'hadoop','USER','hadoop','USER','SELECT',327);
+ insert into tbl_privs values(558,1429268536,1,'hadoop','USER','hadoop','USER','UPDATE',327);
+ insert into tbl_privs values(559,1429268536,1,'hadoop','USER','hadoop','USER','DELETE',327);
