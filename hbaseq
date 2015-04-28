@@ -1,11 +1,12 @@
 1) Explain what is Hbase?
-
-Hbase is a column-oriented database management system which runs on top of HDFS (Hadoop Distribute File System). Hbase is not a relational data store, and it does not support structured query language like SQL.
-
-In Hbase, a master node regulates the cluster and region servers to store portions of the tables and operates the work on the data.
+-->
+Hbase is a column-oriented database management system which runs on top of HDFS (Hadoop Distribute File System). 
+Hbase is not a relational data store, and it does not support structured query language like SQL.
+In Hbase, a master node regulates the cluster and region servers to store portions of the tables and operates the work 
+on the data.
 
 2) Explain why to use Hbase?
-
+-->
 High capacity storage system
 Distributed design to cater large tables
 Column-Oriented Stores
@@ -13,21 +14,24 @@ Horizontally Scalable
 High performance & Availability
 Base goal of Hbase is millions of columns, thousands of versions and billions of rows
 Unlike HDFS (Hadoop Distribute File System), it supports random real time CRUD operations
-3) Mention what are the key components of Hbase?
 
-Zookeeper: It does the co-ordination work between client and Hbase Maser
+3) Mention what are the key components of Hbase?
+-->
+Zookeeper: It does the co-ordination work between client and Hbase Master
 Hbase Master: Hbase Master monitors the Region Server
 RegionServer: RegionServer monitors the Region
 Region: It contains in memory data store(MemStore) and Hfile.
 Catalog Tables: Catalog tables consist of ROOT and META
-4) Explain what does Hbase consists of?
 
+4) Explain what does Hbase consists of?
+-->
 Hbase consists of a set of tables
 And each table contains rows and columns like traditional database
 Each table must contain an element defined as a Primary Key
 Hbase column denotes an attribute of an object
-5) Mention how many operational commands in Hbase?
 
+5) Mention how many operational commands in Hbase?
+-->
 Operational command in Hbases is about five types
 
 Get
@@ -38,17 +42,21 @@ Increment
 hbase_logo
 
 6) Explain what is WAL and Hlog in Hbase?
-
-WAL (Write Ahead Log) is similar to MySQL BIN log; it records all the changes occur in data. It is a standard sequence file by Hadoop and it stores HLogkey’s.  These keys consist of a sequential number as well as actual data and are used to replay not yet persisted data after a server crash. So, in cash of server failure WAL work as a life-line and retrieves the lost data’s.
+-->
+WAL (Write Ahead Log) is similar to MySQL BIN log; it records all the changes occur in data. 
+It is a standard sequence file by Hadoop and it stores HLogkey’s.  
+These keys consist of a sequential number as well as actual data and are used to replay 
+not yet persisted data after a server crash. So, in case of server failure WAL work as a life-line and 
+retrieves the lost data’s.
 
 7) When you should use Hbase?
-
-
- 
+-->
 Data size is huge: When you have tons and millions of records to operate
-Complete Redesign: When you are moving RDBMS to Hbase, you consider it as a complete re-design then mere just changing the ports
+Complete Redesign: When you are moving RDBMS to Hbase, you consider it as a complete re-design 
+then mere just changing the ports
 SQL-Less commands: You have several features like transactions; inner joins, typed columns, etc.
 Infrastructure Investment: You need to have enough cluster for Hbase to be really useful
+
 8) In Hbase what is column families?
 
 Column families comprise the basic unit of physical storage in Hbase to which features like compressions are applied.
