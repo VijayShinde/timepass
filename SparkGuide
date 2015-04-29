@@ -1,0 +1,87 @@
+To know more about spark please refer to this link
+http://spark.apache.org/faq.html
+
+1) Spark Example for Reading file and drop header row.
+-->
+import au.com.bytecode.opencsv.CSVParser
+import org.apache.spark.rdd.RDD
+import org.apache.spark.SparkContext._
+def dropHeader(data: RDD[String]): RDD[String] = {
+  data.mapPartitionsWithIndex((idx, lines) => {
+    if (idx == 0) {
+      lines.drop(1)
+    }
+    lines
+  })
+}
+val crimeFile = "[HDFS]/spark/s_spark/data.csv"
+val crimeData = sc.textFile(crimeFile).cache()
+val withoutHeader: RDD[String] = dropHeader(crimeData)
+--O/P--> res81: String = "id","name"
+  
+2) Program to lemmatize text document. In this we read text documents or comment and removes stopwords,numbers etc. 
+Then perform clustering on output.
+-->
+spark-shell  --jars D:\path\stanford-corenlp-3.5.1.jar,
+D:\path\stanford-corenlp-3.5.1-models.jar
+
+import edu.stanford.nlp.pipeline._
+import edu.stanford.nlp.ling.CoreAnnotations._
+import scala.collection.JavaConversions._
+
+import java.util.Properties
+import scala.collection.mutable.ArrayBuffer
+import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
+val stopWords = sc.broadcast(scala.io.Source.fromFile("[Local]file_path\\stopwords.txt").getLines().toSet).value
+
+def createNLPPipeline(): StanfordCoreNLP = {
+val props = new Properties()
+props.put("annotators","tokenize, ssplit, pos, lemma")
+new StanfordCoreNLP(props)
+}
+def isOnlyLetters(str: String):Boolean = {
+str.forall { c => Character.isLetter(c) }
+}
+
+def plainTextToLemmas(text: String, stopwords: Set[String],
+pipeline: StanfordCoreNLP): Seq[String] = {
+val doc = new Annotation(text)
+pipeline.annotate(doc)
+val lemmas = new ArrayBuffer[String]()
+val sentences = doc.get(classOf[SentencesAnnotation])
+for(sentence <- sentences;token <- sentence.get(classOf[TokensAnnotation])){
+val lemma = token.get(classOf[LemmaAnnotation]) 
+if(lemma.length > 2 && !stopWords.contains(lemma) && isOnlyLetters(lemma)){
+lemmas += lemma.toLowerCase
+}
+}
+lemmas
+}
+
+val pages = sc.broadcast(scala.io.Source.fromFile("[Local]path_to_csv.csv").getLines().toSet).value
+val plainText = pages.filter(_ != null).flatMap(line => line.split(","))
+for (name <- plainText) 
+println(plainTextToLemmas(name, stopWords, pipeline))
+
+3) Program to read csv file contents
+
+import scala.io.Source
+def CSVReader(absPath:String, delimiter:String): List[List[Any]] = {
+    println("Now reading... " + absPath)
+    val MasterList = Source.fromFile(absPath).getLines().toList map {
+        // String#split() takes a regex, thus escaping.
+        _.split("""\""" + delimiter).toList
+    }
+    return MasterList
+}
+
+val file_path = "[Local]filepath.csv"
+var delimiter = "," // I changed your delimiter to pipe since that's what's in your sample data.
+
+
+var CSVContents = CSVReader(file_path, delimiter)
+var header =  CSVContents.take(1)
+
+CSVContents.foreach(println)
