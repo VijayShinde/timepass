@@ -76,4 +76,23 @@ This commands returns files with size.
 hadoop fs -ls -h -R /data/pig/input
 -h is to display output in human readable format
 
+4) What is namenode?
+-->
+The NameNode is the centerpiece of an HDFS file system. 
+It keeps the directory tree of all files in the file system, and tracks where across the cluster the file data is kept.
+It does not store the data of these files itself.
 
+Client applications talk to the NameNode whenever they wish to locate a file, or 
+when they want to add/copy/move/delete a file. The NameNode responds the successful requests by returning a 
+list of relevant DataNode servers where the data lives.
+
+
+5) HADOOP - How NameNode Handles data node failures?
+-->
+NameNode periodically receives a Heartbeat and a Blockreport from each of the DataNodes in the cluster. 
+Receipt of a Heartbeat implies that the DataNode is functioning properly. 
+A Blockreport contains a list of all blocks on a DataNode. When NameNode notices that it has not recieved 
+a hearbeat message from a data node after a certain amount of time, the data node is marked as dead. 
+Since blocks will be under replicated the system begins replicating the blocks that were stored on the dead datanode. 
+The NameNode Orchestrates the replication of data blocks from one datanode to another. 
+The replication data transfer happens directly between datanodes and the data never passes through the namenode.
