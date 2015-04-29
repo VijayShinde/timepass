@@ -96,3 +96,10 @@ a hearbeat message from a data node after a certain amount of time, the data nod
 Since blocks will be under replicated the system begins replicating the blocks that were stored on the dead datanode. 
 The NameNode Orchestrates the replication of data blocks from one datanode to another. 
 The replication data transfer happens directly between datanodes and the data never passes through the namenode.
+
+6) HADOOP - Where is the Mapper Output (intermediate kay-value data) stored ?
+-->
+Map tasks write their output to the local disk, not to HDFS. Why is this? Map output is intermediate output: 
+it's processed by reduce tasks to produce the final output, and once the job is complete the map output 
+can be thrown away. So storing it in HDFS, with replication, would be overkill. 
+
