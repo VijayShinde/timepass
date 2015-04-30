@@ -1,4 +1,4 @@
-This program finds time range 
+1) This program finds time range 
 
 import java.io.*;
 import java.util.Iterator;
@@ -69,3 +69,81 @@ public class JobDetailsProcessor {
 		}
 	}
 }
+
+2)  Java program which converts text documnet into csv
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Time;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
+
+import au.com.bytecode.opencsv.CSVReader;
+
+
+public class MahoutCSVReader {
+	public static void main(String[] args) throws IOException {
+
+		final JFrame parent = new JFrame();
+        JButton button = new JButton();
+
+        button.setText("Click to Start Mahout Clustering!");
+        parent.add(button);
+        parent.pack();
+        parent.setVisible(true);
+
+        button.addActionListener(new java.awt.event.ActionListener() {
+            @SuppressWarnings("deprecation")
+			@Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                String input_Path = JOptionPane.showInputDialog(parent,
+                        "Enter your input directory path ", null);
+                String output_Path = JOptionPane.showInputDialog(parent,
+                        "Enter your output directory path ", null);
+                Time startTime  = new Time(System.currentTimeMillis());
+        		Time endTime  = null;
+        		Configuration conf = new Configuration();
+        		
+        		//        CSVReader reader = null;
+        		try (
+        				FileSystem fs = FileSystem.get(conf);
+        				CSVReader reader = new CSVReader(new FileReader(input_Path),',');
+        				@SuppressWarnings("deprecation")
+        				SequenceFile.Writer writer = new SequenceFile.Writer(fs, conf,new Path(output_Path), Text.class, Text.class)
+        				) {
+        			String[] line;
+        			long counter = 1;
+        			while ((line = reader.readNext()) != null) {
+
+        				Text key = new Text("/"+counter++);
+        				Text val = new Text();
+        				val.set(line[0]);
+        				writer.append(key, val);
+
+        			}
+        			reader.close();
+        			writer.close();
+        			System.out.println("Sequence File created successfully !!!");
+        			int startT = startTime.getSeconds();
+        			endTime = new Time(System.currentTimeMillis());
+        			int endT = endTime.getSeconds();
+        			System.out.println("Program took "+(endT-startT)+" sec");
+        			parent.dispose();
+        		}
+        		catch(Exception e){
+        			e.printStackTrace();
+        		}
+        		JOptionPane.showMessageDialog(parent, "Sequence File created successfully !!!", "Title", 1);
+            }
+        });
+	}
+}
+
