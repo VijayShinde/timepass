@@ -1,0 +1,71 @@
+This program finds time range 
+
+import java.io.*;
+import java.util.Iterator;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer.Context;
+//import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+//import org.apache.hadoop.mapreduce.Mapper.Context;
+import org.apache.hadoop.fs.Path;
+
+public class JobDetailsProcessor {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] arg)throws IOException, ClassNotFoundException, InterruptedException {
+		// TODO Auto-generated method stub
+		if(arg.length>0)
+		{
+			Configuration config=new Configuration();
+			Path p1=new Path(arg[0]);
+			Path p2=new Path(arg[1]);
+
+			Job job = Job.getInstance(config, "myjob");
+
+			job.setJarByClass(JobDetailsProcessor.class);
+
+			job.setMapperClass(MyMap.class);
+
+			job.setOutputKeyClass(Text.class);
+			job.setOutputValueClass(Text.class);
+
+			FileInputFormat.addInputPath(job, p1);
+			FileOutputFormat.setOutputPath(job, p2);
+			System.exit(job.waitForCompletion(true) ? 0 : 1);
+		}
+	}
+	public static class MyMap extends Mapper<LongWritable, Text, Text,Text>
+	{
+		public void map(LongWritable lw ,Text line, Context con) throws IOException,InterruptedException
+		{
+			//String s ="100001 8772 1000 5570,8772,1000,5570,AO,HSD TC,T,Trouble call,EMP,A,1,2014,1,RES,2003,5,75,56,-19,-25.3333,1.21E+12,0.044533637";	
+			String input=line.toString();
+			String [] ar=input.split(",");
+			if(ar[17] != "time_taken"){
+				int n= Integer.parseInt(ar[17]);
+				int  lower = n/60;
+				int uper =lower+1;
+				String key=ar[0];
+				String value=""+lower+""+"-"+uper+"";
+				con.write(new Text(key),new Text(value));
+			}
+		}
+	}	
+	public static class Reduce extends org.apache.hadoop.mapreduce.Reducer<Text,Text, Text, Text>{
+
+		public void reduce(Text key, Iterator<Text> values, Context con) throws IOException, InterruptedException {
+			Text  val=new Text();
+			while(values.hasNext()){
+				val= values.next();
+			}
+			con.write(key,val);
+		}
+	}
+}
