@@ -1,0 +1,4 @@
+Lemmmatization of text.
+
+Responsible for developing scala spark program which is use for preprocessing of text document, 
+such as removal of stopwords, stemmed stopwords, numbers & Lemmmatization etc.
