@@ -101,6 +101,11 @@ hdfs dfs -copyFromLocal '/home/venu/Desktop/somethingfile.xml' hdfs://nn.example
 Qs. Hadoop input split size vs block size? 
 Block is the physical representation of data. Split is the logical representation of data present in Block. Block and split size can be changed in properties. Map reads data from Block through splits i.e. split act as a broker between Block and Mapper. 
 Consider two blocks: Block 1 aa bb cc dd ee ff gg hh ii jj Block 2 ww ee yy uu oo ii oo pp kk ll nn Now map reads block 1 till aa to JJ and doesn't know how to read block 2 i.e. block doesn't know how to process different block of information. Here comes a Split it will form a Logical grouping of Block 1 and Block 2 as single Block, then it forms offset(key) and line (value) using inputformat and record reader and send map to process further processing. If your resource is limited and you want to limit the number of maps you can increase the split size. For example: If we have 640 MB of 10 blocks i.e. each block of 64 MB and resource is limited then you can mention Split size as 128 MB then then logical grouping of 128 MB is formed and only 5 maps will be executed with a size of 128 MB. If we specify split size is false then whole file will form one input split and processed by one map which it takes more time to process when file is big. 
+Two ways we can set split size
+1) The parameter "mapred.max.split.size" which can be set per job 
+2) By writing this code into java file 
+final static long DEFAULT_SPLIT_SIZE = 128 * 1024 * 1024;
+configuration.setLong(FileInputFormat.SPLIT_MAXSIZE, configuration.getLong(FileInputFormat.SPLIT_MAXSIZE,DEFAULT_SPLIT_SIZE ));
 
 Qs.  How to find file biggest size in Unix /Hadoop?
 1) -> du -Sh | sort -rh | head -n 3 returns file size in human readable format in descending order 
