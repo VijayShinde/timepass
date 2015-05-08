@@ -1,0 +1,19 @@
+Commands
+
+How to check values of hadoop cluster-->
+
+C:\Users\vijay.shinde>hadoop fs -count -q -h /
+  QUOTA  REMAINING_QUOTA     SPACE_QUOTA  REMAINING_SPACE_QUOTA    DIR_COUNT  FILE_COUNT      CONTENT_SIZE   FILE_NAME
+  9223372036854775807 9223372036    none             inf             6467         6594        50574578797      /
+   8.0 E           8.0 E            none             inf             6.3 K        6.4 K             47.1 G     /
+    none             inf            none             inf              46          975                 7.4 G    /data
+    
+    
+hadoop fs -du -h /data/pig/input -- size of each
+29.3 M  /data/pig/input/BX-Book-Ratings.csv
+74.2 M  /data/pig/input/BX-Books.csv
+11.7 M  /data/pig/input/BX-Users.csv
+110     /data/pig/input/pigtest.txt
+
+hadoop fs -du -h -s /data/pig/input -- with hypen gives total size of directory
+115.2 M  /data/pig/input
