@@ -1,0 +1,45 @@
+
+Map Reduce MOde:-
+
+pig -x mapreduce D:\datatoload\query\Pig\test.pig
+
+Local Mode:-
+
+pig -x local BookXGroupByYear.pig
+
+-- Reads data from file system
+--BooksRecords = LOAD '/data/pig/input/BX-Books.csv' USING PigStorage(';') AS (ISBN:chararray,BookTitle:chararray,BookAuthor:chararray,YearOfPublication:chararray,Publisher:chararray,ImageURLS:chararray,ImageURLM:chararray,ImageURLL:chararray);
+
+-- Displays the records
+--top10 = LIMIT BooksRecords 10;
+--DUMP BooksRecords;
+--STORE top10 into '/data/pig/output11';
+
+records = LOAD 'D:\\datatoload\\pigtest.txt' USING PigStorage(',') AS (year:chararray,temperature:int,quality:int); 
+filtered_records = FILTER records BY quality==1; 
+grouped_records = GROUP filtered_records BY year; 
+max_temp = FOREACH grouped_records GENERATE group,MAX(filtered_records.temperature); 
+STORE max_temp into 'D:\\datatoload\\out.txt';
+
+
+-- Group BY
+--GroupByYear = GROUP BooksRecords BY YearOfPublication;
+
+-- Count per year
+--CountByYear = FOREACH GroupByYear GENERATE CONCAT((chararray)$0,CONCAT(‘:’,(chararray)COUNT($1)));
+
+--Users = load '/data/pig/input1/BX-Users.csv' as (UserID,Location,Age);
+
+--booksrating = load '/data/pig/input1/BX-Book-Ratings.csv' as (UserID,ISBN,BookRating);
+
+
+--jnres = JOIN Users BY UserID,booksrating BY UserID;
+--top10 = LIMIT jnres 10;
+--DUMP top10;
+
+-- Tested Script
+-- records = LOAD '/data/pig/input/pigtest.txt' USING PigStorage(',') AS (year:chararray,temperature:int,quality:int);
+-- filtered_records = FILTER records BY quality==1;
+-- grouped_records = GROUP filtered_records BY year;
+-- max_temp = FOREACH grouped_records GENERATE group,MAX(filtered_records.temperature);
+-- STORE max_temp into '/data/pig/output/test';
