@@ -155,3 +155,7 @@ Qs. What is the difference between TextInputFormat and KeyValueInputFormat class
 TextInputFormat: It reads lines of text files and provides the offset of the line as key to the Mapper and actual line as Value to the mapper.
 KeyValueInputFormat: Reads text file and parses lines into key, Val1 pairs. Everything up to the first tab character is sent as key to the Mapper and the remainder of the line is sent as value to the mapper.
 
+--New
+
+Qs. Put file with specific block size *** The block size always in multiple of 512 bytes or 1024 etc....	
+hadoop fs -Ddfs.block.size=3145728  -put src  dest
