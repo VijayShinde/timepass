@@ -61,5 +61,73 @@ boosts	9
 business	10
 an so on...
 
+3) Kmeans
+
+Generate  Kmean Clusters  from vectors:
+ 
+mahout kmeans \
+   -i vectors/tfidf-vectors/ \
+   -c kmeans-centroids \
+   -o kmeans-clusters \
+   -k 20 \
+   -ow \
+   -dm org.apache.mahout.common.distance.CosineDistanceMeasure
+
+-c - The input centroids, as Vectors.  Must be a SequenceFile of Writable, Cluster/Canopy
+-k   The k in k-Means. If specified, then a random selection of k Vectors will   be chosen as the Centroid and written to the  clusters input   path.
 
 
+
+Real word example of clustering 
+
+Mahout Status.
+
+	-Recommendatios
+	-Clustering
+		Clustering is all about organizing items from a given collection into groups of similar items or groups.
+		Clustering a collection involves three things:
+		 An algorithm—This is the method used to group the books together.
+		 A notion of both similarity and dissimilarity—In the previous discussion, we relied
+		on your assessment of which books belonged in an existing stack and which
+		should start a new one.
+		 A stopping condition—In the library example, this might be the point beyond
+		which books can’t be stacked anymore, or when the stacks are already quite
+		dissimilar. 
+		Sweet - sugar, honey
+		Shape - circle, square, triangle
+		distance measures and their relationships with clustering. 
+		methods that are popularly used for clustering.
+		Suppose you were given the keys to a library containing thousands of books. The books were arranged in no particular
+		order. Readers entering your library would have to sweep through all the books, one by one, to find a particular book. 
+		Not only is this cumbersome and slow, it’s tedious as well. Sorting the books alphabetically by title would be a vast improvement—for readers
+		searching for a book by title, that is. What if most people were simply browsing, or researching a general subject? Grouping the books by topic 
+		would be more useful than an alphabetical-by-title ordering. But how would you even begin this grouping? Having just taken over this job, 
+		you wouldn’t even be sure what all the books were about—surfing, romance, or topics you hadn’t encountered before. 
+		-The strategy in the library examples was to merge stacks of books until some threshold was reached.
+		The number of clusters formed in this example depended on the data; based on the number of books and the threshold, you might have ended up with 100, 20, or even
+		just 1 cluster
+		- measure of similarity - measure of similarity
+		
+		- Mahout contains various implementations of clustering, like k-means, fuzzy k-means, and canopy to name a few.
+		- There are three steps involved in inputting data for the Mahout clustering algorithms: 
+		   you need to preprocess the data, 
+		   use that data to create vectors, 
+		   and save the	vectors in SequenceFile format as input for the algorithm.
+		- Mahout clustering algorithm reads sequence file as input.
+		
+		In Mahout, vectors are implemented as three different classes, each of which is optimized for different scenarios: 
+		   DenseVector, RandomAccessSparseVector, and SequentialAccessSparseVector. 
+		
+		-- k-means clustering algorithm --
+		
+e.g 2)
+ We have a great mental ability for finding repeating patterns, and
+we continually associate what we see, hear, smell, and taste with things that are
+already in our memory. For example, the taste of honey reminds us more of the
+taste of sugar than salt. So we group together the things that taste like sugar and
+honey and call them sweet. Without even knowing what sweet tastes like, we know
+that all the sugary things in the world are similar and of the same group. We also
+know how different they are from all the things belonging to the salty group.
+Unconsciously, we group together tastes into such arms, and bigger heads. Apes look different from monkeys, but both are fond of
+bananas. So we can think of apes and monkeys as two different groups or as a single
+group of banana-loving primates.
