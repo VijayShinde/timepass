@@ -135,3 +135,18 @@ group of banana-loving primates.
 
 Note: if the -k argument is supplied, any clusters in the -c directory will be overwritten and -k random points will be sampled from the input vectors to become the initial cluster centers.
 In other words: if you know the initial cluster centers, supply them via -c and do not set -k. Otherwise an empty -c folder is okay, if you provide -k, the number of cluster centers to sample.
+
+
+Commands to view results
+mahout canopy -i path/tfidf-vectors -o path/canopy30  -ow -t1 600 -t2 300
+mahout kmeans -i path/tfidf-vectors -o path/kmeans30 -dm org.apache.mahout.common.distance.SquaredEuclideanDistanceMeasure -c path/clusters-0-final -cd 0.5 -ow -x 20 -cl -k 30
+mahout seqdumper path/clusters-20-final/part-r-00000 -o path\cluster1final.txt
+
+mahout clusterdump --seqFileDir /data/clustering/kmeans/clusters-20-final --pointsDir path/clusteredPoints --output path\cluster1final.txt
+
+mahout seq2sparse -i input -o out -ow <<<Other argument -seq true -nr 2 -ng 2 -a -wt tfidf>>>
+ 
+ mahout clusterdump -dt sequencefile -d path/dictionary.file-0 -i path/clusters-7-final -o path\cluster7final.txt
+
+ *** To view output of clustered points *** 
+ mahout clusterdump --input path/clusters-20-final --pointsDir path/clusteredPoints --output path\clusteranalyze.txt
