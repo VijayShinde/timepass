@@ -131,3 +131,7 @@ know how different they are from all the things belonging to the salty group.
 Unconsciously, we group together tastes into such arms, and bigger heads. Apes look different from monkeys, but both are fond of
 bananas. So we can think of apes and monkeys as two different groups or as a single
 group of banana-loving primates.
+
+
+Note: if the -k argument is supplied, any clusters in the -c directory will be overwritten and -k random points will be sampled from the input vectors to become the initial cluster centers.
+In other words: if you know the initial cluster centers, supply them via -c and do not set -k. Otherwise an empty -c folder is okay, if you provide -k, the number of cluster centers to sample.
