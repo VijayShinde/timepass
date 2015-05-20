@@ -1,0 +1,65 @@
+It is data anlytics tools which is used for content categarisation, word analytics & sentiment analysis. 
+In word analytics includes word count, word cloud, clustering, tagging
+word count:
+clustering: Classifies the text data into groups based on the word contained in the text.
+
+In this project,I'm working on clustering module. I've done clustering in mahout. There are few steps involved in mahout
+1) Convert input document into sequence file using java or this command bin/mahout seqdirectory \
+        -i mahout-work/reuters-out \
+        -o mahout-work/reuters-out-seqdir \
+2) seq2sparse 
+Generate tf-idf Vectors from Sequence files:
+
+mahout seq2sparse \
+   -i seqfiles/ \
+   -o vectors/ \
+   -ow \
+   -x 90 \
+  -ng 2 \
+ -wt TF
+
+-x 90 means that if a token appears in 90% of the documents it is considered a stop-word.
+-ng The maximum size of ngrams to  create (2 = bigrams, 3 = trigrams, etc)
+-wt The kind of weight to use. Currently TF or TFIDF. Default: TFIDF
+
+The folder that’s produced using these command-line commands:
+--->
+	df-count/
+	dictionary.file-0
+	frequency.file-0
+	tfidf-vectors/
+	tf-vectors/
+	tokenized-documents/
+	wordcount/
+Details:-
+In the output folder, you’ll find a dictionary file and several directories. The dictionary file contains the mapping between a term and its integer ID. 
+This file is useful when reading the output of different algorithms, so you need to retain it. The other folders are intermediate folders generated 
+during the vectorization process, which happens in multiple steps (multiple MapReduce jobs).
+
+ In the first step, the text documents are tokenized—they’re split into individual words using the Lucene StandardAnalyzer and stored in the tokenized-documents/
+folder. The word-counting step—the n-gram generation step (which in this case only counts unigrams)—iterates through the tokenized documents and generates a set of
+important words from the collection. The third step converts the tokenized documents into vectors using the term-frequency weight, thus creating TF vectors. By
+default, the vectorizer uses the TF-IDF weighting, so two more steps happen after this:
+the document-frequency (DF) counting job, and the TF-IDF vector creation. The TF-IDF weighted vectorized documents are found in the tfidf-vectors/ folder.
+For most applications, you need just this folder and the dictionary file.
+
+DF-count/ : this file contains word id and count across the document for example 
+we have 10000 documents and word hadoop occurs in 1000 document so file will contain.
+id count
+10 1000
+dictionary.file-0/ : The dictionary file contains the mapping between a term and its integer ID. 
+06	0
+2013	1
+8	2
+all	3
+alliance	4
+amazon	5
+aws	6
+azure	7
+blog	8
+boosts	9
+business	10
+an so on...
+
+
+
