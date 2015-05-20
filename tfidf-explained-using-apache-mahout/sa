@@ -1,0 +1,435 @@
+TFIDF explained using Apache Mahout
+Leonard Giura | 18 June 2014 | NLP | 3 Comments
+
+The current article facilitates the understanding of TFIDF (term frequency inverse document frequency) in the machine learning/natural language processing context. We will explain what the term is, then we will create a sample project using Java and Apache Mahout where we can observe how the term is calculated. This project also helps to better understand the Apache Mahout output and input folder structure. Basic Java programming language knowledge is required.
+TFIDF short description
+
+TFIDF – term frequency inverse document frequency is an important weighting scheme which can be used in fields like machine learning, natural language processing, search engines and text mining.  The metric is used to measure the relative importance of a word for a collection of documents.  If a term or word occurs frequently in a document and not so frequently in the entire set of documents, it is more relevant to a search than a word that appears frequently across all the documents.  By calculating TFIDF for all terms which appear in a set of document we can filter away the less relevant words. As an example, a word wich appears only twice in a single document is more relevant to someone searching that document, compare to words which appear many times in all the documents like: the, is, at, and, or, on, etc.  Using TFIDF the later words can be ignored and the relevant ones are retained.
+
+Following, we will gain a better insight of how the TFIDF weight is calculated by using a practical example. We will use the Apache Mahout library to create two simple documents and to calculate the TFIDF for each word in these documents.
+Sample project for TFIDF calculation
+
+Prerequisites:
+
+    Linux or Mac
+    Java 1.7
+    Apache Maven 3
+
+Create the Maven project:
+mvn archetype:create \ -DarchetypeGroupId=org.apache.maven.archetypes \ -DgroupId=com.technobium \ -DartifactId=tfidf
+1
+2
+3
+4
+	
+mvn archetype:create \
+    -DarchetypeGroupId=org.apache.maven.archetypes \
+    -DgroupId=com.technobium \
+    -DartifactId=tfidf
+
+Rename the default created App class to TFIDFTester using the following command:
+mv tfidf/src/main/java/com/technobium/App.java \ tfidf/src/main/java/com/technobium/TFIDFTester.java
+1
+2
+	
+mv tfidf/src/main/java/com/technobium/App.java \
+   tfidf/src/main/java/com/technobium/TFIDFTester.java
+
+Add the Mahout and SLF4J libraries to this project:
+cd tfidf nano pom.xml
+1
+2
+	
+cd tfidf
+nano pom.xml
+
+Add the following lines to the dependencies section:
+<dependencies> ... <dependency> <groupId>org.apache.mahout</groupId> <artifactId>mahout-core</artifactId> <version>0.9</version> </dependency> <dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-simple</artifactId> <version>1.7.7</version> </dependency> </dependencies>
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+	
+<dependencies>
+    ...
+    <dependency>
+        <groupId>org.apache.mahout</groupId>
+        <artifactId>mahout-core</artifactId>
+        <version>0.9</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.7</version>
+    </dependency>
+</dependencies>
+
+Edit the TFIDFTester class file and add the code below:
+package com.technobium; import java.io.IOException; import java.util.List; import org.apache.hadoop.conf.Configuration; import org.apache.hadoop.fs.FileSystem; import org.apache.hadoop.fs.Path; import org.apache.hadoop.io.SequenceFile; import org.apache.hadoop.io.Text; import org.apache.hadoop.io.Writable; import org.apache.lucene.analysis.standard.StandardAnalyzer; import org.apache.mahout.common.Pair; import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterable; import org.apache.mahout.vectorizer.DictionaryVectorizer; import org.apache.mahout.vectorizer.DocumentProcessor; import org.apache.mahout.vectorizer.common.PartialVectorMerger; import org.apache.mahout.vectorizer.tfidf.TFIDFConverter; public class TFIDFTester { String outputFolder; Configuration configuration; FileSystem fileSystem; Path documentsSequencePath; Path tokenizedDocumentsPath; Path tfidfPath; Path termFrequencyVectorsPath; public static void main(String args[]) throws Exception { TFIDFTester tester = new TFIDFTester(); tester.createTestDocuments(); tester.calculateTfIdf(); tester.printSequenceFile(tester.documentsSequencePath); System.out.println("\n Step 1: Word count "); tester.printSequenceFile(new Path(tester.outputFolder + "wordcount/part-r-00000")); System.out.println("\n Step 2: Word dictionary "); tester.printSequenceFile(new Path(tester.outputFolder, "dictionary.file-0")); System.out.println("\n Step 3: Term Frequency Vectors "); tester.printSequenceFile(new Path(tester.outputFolder + "tf-vectors/part-r-00000")); System.out.println("\n Step 4: Document Frequency "); tester.printSequenceFile(new Path(tester.outputFolder + "tfidf/df-count/part-r-00000")); System.out.println("\n Step 5: TFIDF "); tester.printSequenceFile(new Path(tester.outputFolder + "tfidf/tfidf-vectors/part-r-00000")); } public TFIDFTester() throws IOException { configuration = new Configuration(); fileSystem = FileSystem.get(configuration); outputFolder = "output/"; documentsSequencePath = new Path(outputFolder, "sequence"); tokenizedDocumentsPath = new Path(outputFolder, DocumentProcessor.TOKENIZED_DOCUMENT_OUTPUT_FOLDER); tfidfPath = new Path(outputFolder + "tfidf"); termFrequencyVectorsPath = new Path(outputFolder + DictionaryVectorizer.DOCUMENT_VECTOR_OUTPUT_FOLDER); } public void createTestDocuments() throws IOException { SequenceFile.Writer writer = new SequenceFile.Writer(fileSystem, configuration, documentsSequencePath, Text.class, Text.class); Text id1 = new Text("Document 1"); Text text1 = new Text("I saw a yellow car and a green car."); writer.append(id1, text1); Text id2 = new Text("Document 2"); Text text2 = new Text("You saw a red car."); writer.append(id2, text2); writer.close(); } public void calculateTfIdf() throws ClassNotFoundException, IOException, InterruptedException { // Tokenize the documents using Apache Lucene StandardAnalyzer DocumentProcessor.tokenizeDocuments(documentsSequencePath, StandardAnalyzer.class, tokenizedDocumentsPath, configuration); DictionaryVectorizer.createTermFrequencyVectors(tokenizedDocumentsPath, new Path(outputFolder), DictionaryVectorizer.DOCUMENT_VECTOR_OUTPUT_FOLDER, configuration, 1, 1, 0.0f, PartialVectorMerger.NO_NORMALIZING, true, 1, 100, false, false); Pair<Long[], List<Path>> documentFrequencies = TFIDFConverter .calculateDF(termFrequencyVectorsPath, tfidfPath, configuration, 100); TFIDFConverter.processTfIdf(termFrequencyVectorsPath, tfidfPath, configuration, documentFrequencies, 1, 100, PartialVectorMerger.NO_NORMALIZING, false, false, false, 1); } void printSequenceFile(Path path) { SequenceFileIterable<Writable, Writable> iterable = new SequenceFileIterable<Writable, Writable>( path, configuration); for (Pair<Writable, Writable> pair : iterable) { System.out .format("%10s -> %s\n", pair.getFirst(), pair.getSecond()); } } }
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+	
+package com.technobium;
+ 
+import java.io.IOException;
+import java.util.List;
+ 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.mahout.common.Pair;
+import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterable;
+import org.apache.mahout.vectorizer.DictionaryVectorizer;
+import org.apache.mahout.vectorizer.DocumentProcessor;
+import org.apache.mahout.vectorizer.common.PartialVectorMerger;
+import org.apache.mahout.vectorizer.tfidf.TFIDFConverter;
+ 
+public class TFIDFTester {
+ 
+    String outputFolder;
+    Configuration configuration;
+    FileSystem fileSystem;
+    Path documentsSequencePath;
+    Path tokenizedDocumentsPath;
+    Path tfidfPath;
+    Path termFrequencyVectorsPath;
+ 
+    public static void main(String args[]) throws Exception {
+ 
+        TFIDFTester tester = new TFIDFTester();
+ 
+        tester.createTestDocuments();
+        tester.calculateTfIdf();
+ 
+        tester.printSequenceFile(tester.documentsSequencePath);
+ 
+        System.out.println("\n Step 1: Word count ");
+        tester.printSequenceFile(new Path(tester.outputFolder
+                + "wordcount/part-r-00000"));
+ 
+        System.out.println("\n Step 2: Word dictionary ");
+        tester.printSequenceFile(new Path(tester.outputFolder,
+                "dictionary.file-0"));
+ 
+        System.out.println("\n Step 3: Term Frequency Vectors ");
+        tester.printSequenceFile(new Path(tester.outputFolder
+                + "tf-vectors/part-r-00000"));
+ 
+        System.out.println("\n Step 4: Document Frequency ");
+        tester.printSequenceFile(new Path(tester.outputFolder
+                + "tfidf/df-count/part-r-00000"));
+ 
+        System.out.println("\n Step 5: TFIDF ");
+        tester.printSequenceFile(new Path(tester.outputFolder
+                + "tfidf/tfidf-vectors/part-r-00000"));
+ 
+    }
+ 
+    public TFIDFTester() throws IOException {
+ 
+        configuration = new Configuration();
+        fileSystem = FileSystem.get(configuration);
+ 
+        outputFolder = "output/";
+        documentsSequencePath = new Path(outputFolder, "sequence");
+        tokenizedDocumentsPath = new Path(outputFolder,
+                DocumentProcessor.TOKENIZED_DOCUMENT_OUTPUT_FOLDER);
+        tfidfPath = new Path(outputFolder + "tfidf");
+        termFrequencyVectorsPath = new Path(outputFolder
+                + DictionaryVectorizer.DOCUMENT_VECTOR_OUTPUT_FOLDER);
+    }
+ 
+    public void createTestDocuments() throws IOException {
+        SequenceFile.Writer writer = new SequenceFile.Writer(fileSystem,
+                configuration, documentsSequencePath, Text.class, Text.class);
+ 
+        Text id1 = new Text("Document 1");
+        Text text1 = new Text("I saw a yellow car and a green car.");
+        writer.append(id1, text1);
+ 
+        Text id2 = new Text("Document 2");
+        Text text2 = new Text("You saw a red car.");
+        writer.append(id2, text2);
+ 
+        writer.close();
+    }
+ 
+    public void calculateTfIdf() throws ClassNotFoundException, IOException,
+            InterruptedException {
+ 
+        // Tokenize the documents using Apache Lucene StandardAnalyzer
+        DocumentProcessor.tokenizeDocuments(documentsSequencePath,
+                StandardAnalyzer.class, tokenizedDocumentsPath, configuration);
+ 
+        DictionaryVectorizer.createTermFrequencyVectors(tokenizedDocumentsPath,
+                new Path(outputFolder),
+                DictionaryVectorizer.DOCUMENT_VECTOR_OUTPUT_FOLDER,
+                configuration, 1, 1, 0.0f, PartialVectorMerger.NO_NORMALIZING,
+                true, 1, 100, false, false);
+ 
+        Pair<Long[], List<Path>> documentFrequencies = TFIDFConverter
+                .calculateDF(termFrequencyVectorsPath, tfidfPath,
+                        configuration, 100);
+ 
+        TFIDFConverter.processTfIdf(termFrequencyVectorsPath, tfidfPath,
+                configuration, documentFrequencies, 1, 100,
+                PartialVectorMerger.NO_NORMALIZING, false, false, false, 1);
+    }
+ 
+    void printSequenceFile(Path path) {
+        SequenceFileIterable<Writable, Writable> iterable = new SequenceFileIterable<Writable, Writable>(
+                path, configuration);
+        for (Pair<Writable, Writable> pair : iterable) {
+            System.out
+                    .format("%10s -> %s\n", pair.getFirst(), pair.getSecond());
+        }
+    }
+}
+
+You can run the  Test class by using the following commands:
+mvn compile mvn exec:java -Dexec.mainClass="com.technobium.tfidf.TFIDFTester"
+1
+2
+	
+mvn compile
+mvn exec:java -Dexec.mainClass="com.technobium.tfidf.TFIDFTester"
+
+At end of the console log you should see the following results:
+Document 1 -> I saw a yellow car and a green car. Document 2 -> You saw a red car. Step 1: Word count car -> 3 green -> 1 i -> 1 red -> 1 saw -> 2 yellow -> 1 you -> 1 Step 2: Word dictionary car -> 0 green -> 1 i -> 2 red -> 3 saw -> 4 yellow -> 5 you -> 6 Step 3: Term Frequency Vectors Document 1 -> {0:2.0,1:1.0,2:1.0,4:1.0,5:1.0} Document 2 -> {0:1.0,3:1.0,4:1.0,6:1.0} Step 4: Document Frequency -1 -> 2 0 -> 2 1 -> 1 2 -> 1 3 -> 1 4 -> 2 5 -> 1 6 -> 1 Step 5: TFIDF Document 1 -> {0:0.8407992720603943,1:1.0,2:1.0,4:0.5945348739624023,5:1.0} Document 2 -> {0:0.5945348739624023,3:1.0,4:0.5945348739624023,6:1.0}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+	
+Document 1 -> I saw a yellow car and a green car.
+Document 2 -> You saw a red car.
+ 
+Step 1: Word count
+       car -> 3
+     green -> 1
+         i -> 1
+       red -> 1
+       saw -> 2
+    yellow -> 1
+       you -> 1
+ 
+Step 2: Word dictionary
+       car -> 0
+     green -> 1
+         i -> 2
+       red -> 3
+       saw -> 4
+    yellow -> 5
+       you -> 6
+ 
+Step 3: Term Frequency Vectors
+Document 1 -> {0:2.0,1:1.0,2:1.0,4:1.0,5:1.0}
+Document 2 -> {0:1.0,3:1.0,4:1.0,6:1.0}
+ 
+Step 4: Document Frequency
+        -1 -> 2
+         0 -> 2
+         1 -> 1
+         2 -> 1
+         3 -> 1
+         4 -> 2
+         5 -> 1
+         6 -> 1
+ 
+Step 5: TFIDF
+Document 1 -> {0:0.8407992720603943,1:1.0,2:1.0,4:0.5945348739624023,5:1.0}
+Document 2 -> {0:0.5945348739624023,3:1.0,4:0.5945348739624023,6:1.0}
+
+TFIDF Calculation
+
+As you can see, we have the two sample documents as input. Mahout starts by counting the occurrences of every word in the document collection. Next, a dictionary entry is created for each word. From now on, the dictionary value will be used for calculations, instead of the actual word.
+
+The Term Frequency (TF) is calculated by counting the occurrences of every word in a given document. You can see that the word car (the value 0, according to the dictionary) has the frequency 2.0 (0:2.0) in the first document and 1.o (0:1.0) for the second one.
+
+The Document Frequency (DF) is calculated by counting  for each word in how many documents it appears. You can see that the words car and saw have the count 2 as they appear in both documents. All other words have the count 1. The first entry, -1 is the total document count.
+
+In the final, the TFIDF is calculated by multiplying TF and IDF (Inverse Document Frequency):
+
+TFIDF = TF x IDF
+
+If we take the word red (3 according to the dictionary ) TF  is pretty straightforward: the term is found once in the first document, hence the TF is 1.0.
+
+IDF is obtained using the following natural logarithm formula:
+
+IDF = log (Total document count / (document frequency + 1) ) + 1
+
+Mahout delegates the actual calculation of the IDF to the Apache Lucene library, more precisely to the DefaultSimilarity class.
+
+For red we will have IDF = log ( 2  / (1 + 1) )  + 1 = 1
+
+We will have TFIDF for the term red: TFIDF = 1 x 1 = 1
+
+As you can see, the word car which appears in both documents, has a lower weight (0.59) compared to the word red (1.0) which appears in one document.
+Conclusion
+
+TFIDF is a fundamental term in the context of machine learning, natural language processing, search engines and text mining. A deep understanding of this term is needed for efficient implementations of machine learning or natural language processing projects.
