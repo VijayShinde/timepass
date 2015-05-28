@@ -20,12 +20,15 @@ hadoop fs -du -h -s /data/pig/input -- with hypen gives total size of directory
 
 -- Hive Yarn 
 1) How to change default file format to ORC?
---> SET hive.default.fileformat=Orc
+--> SET hive.default.fileformat=Orc --OR-- ALTER TABLE dbname.tablename SET FILEFORMAT ORC;
 
-2) How to kill YARN Application?
+2) How to set Header to display on hive shell?
+--> SET hive.cli.print.header=true
+
+3) How to kill YARN Application?
 --> yarn application -list
 
-3) How to see application status?
+4) How to see application status?
 --> yarn application -status application_1431933898363_0143
 Application Report :
         Application-Id : application_1431933898363_0143
@@ -44,7 +47,7 @@ Application Report :
         Aggregate Resource Allocation : 2322425 MB-seconds, 1132 vcore-seconds
         Diagnostics :
         
-4) How to see which application in which States, for example How many application in RUNNING stage?
+5) How to see which application in which States, for example How many application in RUNNING stage?
 --> yarn application -list -appStates RUNNING ( This show list of application which has RUNNING stage)
     yarn application -list -appTypes TEZ  ( This show list of application which has TEZ as a application type)
 Total number of applications (application-types: [] and states: [RUNNING]):1
@@ -53,6 +56,21 @@ Total number of applications (application-types: [] and states: [RUNNING]):1
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 application_1431933898363_0143 | HIVE-02a29667-9923-4b9a-838c-82c52aed0631 |     TEZ           | hadoop | default |  RUNNING  | UNDEFINED   |  40%     |      N/A     |
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+5) How to see ORC File data?
+--> hive orcfiledump
+// Hive version 0.11 through 0.14:
+hive --orcfiledump <location-of-orc-file>
+ 
+// Hive version 0.15 and later:
+hive --orcfiledump [-d] [--rowindex <col_ids>] <location-of-orc-file>
+ -d - dumps data in orc file format
+// Hive version 1.2.0 and later:
+hive --orcfiledump [-d] [-t] [--rowindex <col_ids>] <location-of-orc-file>
+ -t prints timezone id of writer
+// Hive version 1.3.0 and later:
+hive --orcfiledump [-j] [-p] [-d] [-t] [--rowindex <col_ids>] <location-of-orc-file>
+-j prints orc file metadata into json format
 
 HELP OF YARN COMMANDS
 
@@ -80,3 +98,23 @@ usage: application
                                  application to.
  -status <Application ID>        Prints the status of the application.
 
+Usage: yarn [--config confdir] COMMAND
+       where COMMAND is one of:
+  resourcemanager      run the ResourceManager
+  nodemanager          run a nodemanager on each slave
+  timelineserver       run the timeline server
+  rmadmin              admin tools
+  version              print the version
+  jar <jar>          run a jar file
+  application          prints application(s) report/kill application
+  applicationattempt   prints applicationattempt(s) report
+  container            prints container(s) report
+  node                 prints node report(s)
+  cluster              print cluster information
+  queue                prints queue information
+  logs                 dump container logs
+  classpath            prints the class path needed to get the
+                       Hadoop jar and the required libraries
+  daemonlog            get/set the log level for each daemon
+  or
+  CLASSNAME            run the class named CLASSNAME
