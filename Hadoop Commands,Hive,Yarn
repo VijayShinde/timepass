@@ -1,5 +1,8 @@
 Commands
 
+Changing the block size of a dfs file & replication in Hadoop 
+--> hadoop fs -Ddfs.blocksize=1m -Ddfs.replication=1 -put D:\datatoload\query\dtcctsv.txt /data
+
 How to check values of hadoop cluster-->
 
 C:\Users\vijay.shinde>hadoop fs -count -q -h /
@@ -8,6 +11,8 @@ C:\Users\vijay.shinde>hadoop fs -count -q -h /
    8.0 E           8.0 E            none             inf             6.3 K        6.4 K             47.1 G     /
     none             inf            none             inf              46          975                 7.4 G    /data
     
+* How to calculate maximum size file in hadoop directory?
+--> hadoop fs -du -h / | sort | head -3
     
 hadoop fs -du -h /data/pig/input -- size of each
 29.3 M  /data/pig/input/BX-Book-Ratings.csv
