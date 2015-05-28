@@ -17,3 +17,66 @@ hadoop fs -du -h /data/pig/input -- size of each
 
 hadoop fs -du -h -s /data/pig/input -- with hypen gives total size of directory
 115.2 M  /data/pig/input
+
+-- Hive Yarn 
+1) How to change default file format to ORC?
+--> SET hive.default.fileformat=Orc
+
+2) How to kill YARN Application?
+--> yarn application -list
+
+3) How to see application status?
+--> yarn application -status application_1431933898363_0143
+Application Report :
+        Application-Id : application_1431933898363_0143
+        Application-Name : HIVE-02a29667-9923-4b9a-838c-82c52aed0631
+        Application-Type : TEZ
+        User : hadoop
+        Queue : default
+        Start-Time : 1432804684236
+        Finish-Time : 0
+        Progress : 40%
+        State : RUNNING
+        Final-State : UNDEFINED
+        Tracking-URL : N/A
+        RPC Port : 61862
+        AM Host : PDLFSSANDBOX04
+        Aggregate Resource Allocation : 2322425 MB-seconds, 1132 vcore-seconds
+        Diagnostics :
+        
+4) How to see which application in which States, for example How many application in RUNNING stage?
+--> yarn application -list -appStates RUNNING ( This show list of application which has RUNNING stage)
+    yarn application -list -appTypes TEZ  ( This show list of application which has TEZ as a application type)
+Total number of applications (application-types: [] and states: [RUNNING]):1
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Application-Id                | Application-Name                          |  Application-Type |  User  |  Queue  |   State   | Final-State | Progress | Tracking-URL |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+application_1431933898363_0143 | HIVE-02a29667-9923-4b9a-838c-82c52aed0631 |     TEZ           | hadoop | default |  RUNNING  | UNDEFINED   |  40%     |      N/A     |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+HELP OF YARN COMMANDS
+
+usage: application
+ -appStates <States>             Works with -list to filter applications
+                                 based on input comma-separated list of
+                                 application states. The valid application
+                                 state can be one of the following:
+                                 ALL,NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUN
+                                 NING,FINISHED,FAILED,KILLED
+ -appTypes <Types>               Works with -list to filter applications
+                                 based on input comma-separated list of
+                                 application types.
+ -help                           Displays help for all commands.
+ -kill <Application ID>          Kills the application.
+ -list                           List applications. Supports optional use
+                                 of -appTypes to filter applications based
+                                 on application type, and -appStates to
+                                 filter applications based on application
+                                 state.
+ -movetoqueue <Application ID>   Moves the application to a different
+                                 queue.
+ -queue <Queue Name>             Works with the movetoqueue command to
+                                 specify which queue to move an
+                                 application to.
+ -status <Application ID>        Prints the status of the application.
+
