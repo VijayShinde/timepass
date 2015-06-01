@@ -1,0 +1,23 @@
+Auto-Sharding
+The basic unit of scalability and load balancing in HBase is called a region. Regions are
+essentially contiguous ranges of rows stored together. They are dynamically split by
+the system when they become too large. Alternatively, they may also be merged to
+reduce their number and required storage files.*
+The HBase regions are equivalent to range partitions as used in database
+sharding. They can be spread across many physical servers, thus distributing
+the load, and therefore providing scalability.
+Initially there is only one region for a table, and as you start adding data to it, the system
+is monitoring it to ensure that you do not exceed a configured maximum size. If you
+exceed the limit, the region is split into two at the middle key—the row key in the middle
+of the region—creating two roughly equal halves (more details in Chapter 8).
+Each region is served by exactly one region server, and each of these servers can serve
+many regions at any time. Figure 1-7 shows how the logical view of a table is actually
+a set of regions hosted by many region servers.
+Splitting and serving regions can be thought of as autosharding, as offered by other
+systems. The regions allow for fast recovery when a server fails, and fine-grained load
+balancing since they can be moved between servers when the load of the server currently
+serving the region is under pressure, or if that server becomes unavailable because of a
+failure or because it is being decommissioned.
+Splitting is also very fast—close to instantaneous—because the split regions simply
+read from the original storage files until a compaction rewrites them into separate ones
+asynchronously. This is explained in detail in
